@@ -1,0 +1,14 @@
+﻿生成启动时间为 2018/7/2 15:19:49。
+     1>项目“Y:\work\project\zhongqi\external\yanghui11\SMJni\SMJni\SMJni.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         F:\vs\install\VC\bin\CL.exe /c /I"D:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include" /IY:\work\project\j6\mydroid\frameworks\native\include /IY:\work\project\j6\mydroid\system\core\include /IY:\work\project\zhongqi\libnativehelper\include\nativehelper /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp smoperator.cpp
+         smoperator.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         main.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         正在生成代码...
+     1>已完成生成项目“Y:\work\project\zhongqi\external\yanghui11\SMJni\SMJni\SMJni.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:03.95

@@ -1,0 +1,64 @@
+﻿生成启动时间为 2018/7/2 15:19:48。
+     1>项目“Y:\work\project\zhongqi\external\yanghui11\Project1\Project1.vcxproj”在节点 3 上(Build 个目标)。
+     1>ClCompile:
+         F:\vs\install\VC\bin\CL.exe /c /IY:\work\project\zhongqi\libnativehelper\include\nativehelper /IY:\work\project\j6\mydroid\system\core\include /IY:\work\project\j6\mydroid\frameworks\native\include /I"D:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt base_socket.cpp file_operator.cpp IyanghuiService.cpp main.cpp socket_test.cpp yanghuiService.cpp
+         yanghuiService.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C2144: 语法错误:“char”的前面应有“;”
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2146: 语法错误: 缺少“;”(在标识符“int8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2378: “__int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35) : 参见“__int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2146: 语法错误: 缺少“;”(在标识符“int_least8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2146: 语法错误: 缺少“;”(在标识符“int_fast8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         socket_test.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         main.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C2144: 语法错误:“char”的前面应有“;”
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2146: 语法错误: 缺少“;”(在标识符“int8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2378: “__int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35) : 参见“__int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2146: 语法错误: 缺少“;”(在标识符“int_least8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2146: 语法错误: 缺少“;”(在标识符“int_fast8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         IyanghuiService.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C2144: 语法错误:“char”的前面应有“;”
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2146: 语法错误: 缺少“;”(在标识符“int8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57): error C2378: “__int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(35) : 参见“__int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2146: 语法错误: 缺少“;”(在标识符“int_least8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(72): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2146: 语法错误: 缺少“;”(在标识符“int_fast8_t”的前面)
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C4430: 缺少类型说明符 - 假定为 int。注意:  C++ 不支持默认 int
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(84): error C2378: “int8_t”: 重定义；符号不能由 typedef 重载
+                 d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\stdint.h(57) : 参见“int8_t”的声明
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         file_operator.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         base_socket.cpp
+     1>d:\sdk\ndk-bundle\platforms\android-23\arch-arm\usr\include\sys\cdefs.h(277): fatal error C1189: #error :  "No function renaming possible"
+         正在生成代码...
+     1>已完成生成项目“Y:\work\project\zhongqi\external\yanghui11\Project1\Project1.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:04.74
