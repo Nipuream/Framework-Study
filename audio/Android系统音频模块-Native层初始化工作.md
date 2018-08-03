@@ -2,7 +2,11 @@
 
 在前面一篇的文章中，我们知道了音频模块Java层所做的一些事情，总的来说还是比较简单的，下面我们继续学习和探索Native层中系统做了什么工作，首先先简单介绍下，Native层采用了C/S的架构方式，AudioTrack是属于Client端的，AudioFlinger和AudioPolicyService是属于服务端的，AudioFlinger是唯一可以调用HAL层接口的地方，而AudioPolicyService主要是对一些音频策略的选择和一些逻辑调用的中转，下面先来看看Client端AudioTrack都做了什么。
 
+
+
 > 首先需要注意的是，我们本篇文章只描述Native层代码的初始化工作，因为整个Native层的代码和逻辑是整个音频模块的核心，想要在一篇文章中讲述完整那是不可能的，其中的很多地方的知识点都可以单独拿出来写一篇文章。
+
+
 
 ## 1. AudioTrack的初始化工作
 
@@ -1060,6 +1064,8 @@ public:
 ```
 
 说实话，确实不太懂。似乎方法挺杂的，从注释上来看，前面的一些方法对Track对象进行的一些操作，后面有对HAL层的调用，有对线程的控制，那么Track又是什么呢？一头雾水，看来只有分析到Server端，我们才会解开这些谜团了。
+
+
 
 ## 2. Server端的初始化工作
 
@@ -2550,3 +2556,206 @@ bool AudioPolicyService::AudioCommandThread::threadLoop()
 ```
 
 上面的代码比较简单，我觉得对各位看客来说，还是比较容易理解的。值得一提的是，最后任务交给AudioSystem来处理，其实经过几次函数调用，还是AudioFlinger去处理了，所以为什么我上面那么说。至此，AudioTrack，AudioFlinger，AudioPolicyService初始化所作的事情，已经全部分析完了。
+
+
+
+## 3. 进入就绪状态
+
+在上面两节，我们一起学习了客户端和服务端的初始化工作，我们知道了它们在初始化状态到底做了什么事情，还有他们接口之间的联系，接下来我们回顾下Java空间所执行的代码：
+
+ ***audioTrack.play();***
+
+我们从JNI来一直追溯到Native层代码：
+
+```c++
+static void
+android_media_AudioTrack_start(JNIEnv *env, jobject thiz)
+{
+    sp<AudioTrack> lpTrack = getAudioTrack(env, thiz);
+    if (lpTrack == NULL) {
+        jniThrowException(env, "java/lang/IllegalStateException",
+            "Unable to retrieve AudioTrack pointer for start()");
+        return;
+    }
+
+    lpTrack->start();
+}
+
+//Native层的 AudioTrack
+status_t AudioTrack::start()
+{
+    AutoMutex lock(mLock);
+
+    //...
+
+    status_t status = NO_ERROR;
+    if (!(flags & CBLK_INVALID)) {
+        //调用 IAudioTrack 的start 方法
+        //根据我们上面分析，直接去找服务端的 TrackHandle 的实现
+        status = mAudioTrack->start();
+        if (status == DEAD_OBJECT) {
+            flags |= CBLK_INVALID;
+        }
+    }
+
+    //...
+
+    return status;
+}
+
+//TrackHandle -> start()
+status_t AudioFlinger::TrackHandle::start() {
+    return mTrack->start();
+}
+
+```
+
+最后TrackHandle执行的start()方法中的mTrack的实现就是Tracks.cpp，我们一起看下它到底做了什么：
+
+```c++
+status_t AudioFlinger::PlaybackThread::Track::start(AudioSystem::sync_event_t event __unused,
+                                                    int triggerSession __unused)
+{
+    status_t status = NO_ERROR;
+    ALOGV("start(%d), calling pid %d session %d",
+            mName, IPCThreadState::self()->getCallingPid(), mSessionId);
+
+       //...
+ 
+        Mutex::Autolock _lth(thread->mLock);
+        track_state state = mState;
+        // here the track could be either new, or restarted
+        // in both cases "unstop" the track
+
+        // initial state-stopping. next state-pausing.
+        // What if resume is called ?
+
+        //确定Track的状态
+        if (state == PAUSED || state == PAUSING) {
+            if (mResumeToStopping) {
+                // happened we need to resume to STOPPING_1
+                mState = TrackBase::STOPPING_1;
+                ALOGV("PAUSED => STOPPING_1 (%d) on thread %p", mName, this);
+            } else {
+                mState = TrackBase::RESUMING;
+                ALOGV("PAUSED => RESUMING (%d) on thread %p", mName, this);
+            }
+        } else {
+            mState = TrackBase::ACTIVE;
+            ALOGV("? => ACTIVE (%d) on thread %p", mName, this);
+        }
+
+        //获取到播放线程
+        PlaybackThread *playbackThread = (PlaybackThread *)thread.get();
+        if (isFastTrack()) {
+            // refresh fast track underruns on start because that field is never cleared
+            // by the fast mixer; furthermore, the same track can be recycled, i.e. start
+            // after stop.
+            mObservedUnderruns = playbackThread->getFastTrackUnderruns(mFastIndex);
+        }
+        //1. 调用它的 addTrack_l()方法
+        status = playbackThread->addTrack_l(this);
+        if (status == INVALID_OPERATION || status == PERMISSION_DENIED) {
+            triggerEvents(AudioSystem::SYNC_EVENT_PRESENTATION_COMPLETE);
+            //  restore previous state if start was rejected by policy manager
+            if (status == PERMISSION_DENIED) {
+                mState = state;
+            }
+        }
+        // track was already in the active list, not a problem
+        if (status == ALREADY_EXISTS) {
+            status = NO_ERROR;
+        } else {
+            // Acknowledge any pending flush(), so that subsequent new data isn't discarded.
+            // It is usually unsafe to access the server proxy from a binder thread.
+            // But in this case we know the mixer thread (whether normal mixer or fast mixer)
+            // isn't looking at this track yet:  we still hold the normal mixer thread lock,
+            // and for fast tracks the track is not yet in the fast mixer thread's active set.
+            // For static tracks, this is used to acknowledge change in position or loop.
+            ServerProxy::Buffer buffer;
+            buffer.mFrameCount = 1;
+            (void) mAudioTrackServerProxy->obtainBuffer(&buffer, true /*ackFlush*/);
+        }
+    } else {
+        status = BAD_VALUE;
+    }
+    return status;
+}
+```
+
+我们继续分析它的addTrack_l()方法：
+
+```c++
+// addTrack_l() must be called with ThreadBase::mLock held
+status_t AudioFlinger::PlaybackThread::addTrack_l(const sp<Track>& track)
+{
+    status_t status = ALREADY_EXISTS;
+
+    // set retry count for buffer fill
+    //当Track对象为Active状态，playbackThread会处理它内部的音频数据，
+    //如果Track还没有填充满 buffer，则playbackThread会一直尝试重新获取，
+    //mRetryCount是最大尝试次数
+    track->mRetryCount = kMaxTrackStartupRetries;
+    if (mActiveTracks.indexOf(track) < 0) {
+        // the track is newly added, make sure it fills up all its
+        // buffers before playing. This is to ensure the client will
+        // effectively get the latency it requested.
+        if (track->isExternalTrack()) {
+            TrackBase::track_state state = track->mState;
+            mLock.unlock();
+            //根据 streamType 去寻找输出设备，在此过程中，输出设备可能会发生改变，
+            //例如，突然你插入耳机，切换到蓝牙音乐？
+            status = AudioSystem::startOutput(mId, track->streamType(),
+                                              (audio_session_t)track->sessionId());
+            mLock.lock();
+            // abort track was stopped/paused while we released the lock
+            if (state != track->mState) {
+                if (status == NO_ERROR) {
+                    mLock.unlock();
+                    AudioSystem::stopOutput(mId, track->streamType(),
+                                            (audio_session_t)track->sessionId());
+                    mLock.lock();
+                }
+                return INVALID_OPERATION;
+            }
+            // abort if start is rejected by audio policy manager
+            if (status != NO_ERROR) {
+                return PERMISSION_DENIED;
+            }
+#ifdef ADD_BATTERY_DATA
+            // to track the speaker usage
+            addBatteryData(IMediaPlayerService::kBatteryDataAudioFlingerStart);
+#endif
+        }
+
+        //更新 track 的填充状态，是填充好了，还是正在填充
+        //这里也很好理解，sharedBuffer() !=0 是STATIC模式，早就在客户端就已经填充好数据了
+        track->mFillingUpStatus = track->sharedBuffer() != 0 ? Track::FS_FILLED : Track::FS_FILLING;
+        track->mResetDone = false;
+        track->mPresentationCompleteFrames = 0;
+        //将此track添加活跃tracks数组，因为playbackThread只会对活跃数组进行处理
+        mActiveTracks.add(track);
+        mWakeLockUids.add(track->uid());
+        mActiveTracksGeneration++;
+        mLatestActiveTrack = track;
+        sp<EffectChain> chain = getEffectChain_l(track->sessionId());
+        if (chain != 0) {
+            ALOGV("addTrack_l() starting track on chain %p for session %d", chain.get(),
+                    track->sessionId());
+            chain->incActiveTrackCnt();
+        }
+
+        status = NO_ERROR;
+    }
+
+    //这里很重要，释放同步锁，此时PlaybackThread就开始进入工作状态
+    onAddNewTrack_l();
+    return status;
+}
+```
+
+上述代码中的 startOutput() 我们就先不看了，因为它和音频策略相关，我们后面专门针对这个来学习，到这里，我们应该大致了解了当Java层调用 AudioTrack.play()，系统到底做了什么事情。虽然我们在mediasever进程中初始化AudioPolicyService的时候已经创建了各种设备的输出线程，但是直到客户端调用play()，这些线程才真的运行起来。
+
+## 4. 总结
+
+本篇文章我们学习了音频Native层的客户端和服务端的初始化工作，我们主要学习了在STREAM模式下，服务端创建共享内存的过程，我们学习了AudioPolicyService会根据硬件设备的不同，创建不同的输出线程，并且，客户端是根据output去查找服务端的输出线程的，并且当客户端调用play()这个函数的时候，服务端的PlaybackThread才开始真正的工作，不断的从Track对象中读取客户端填充的buffer ... ，我们收获满满，但是我想说的是，这些都是音频模块的初始化过程，真正的核心的地方，我们还没有接触，例如，客户端和服务端是如何通过共享内存通信的，怎么控制这块共享内存的？例如，客户端根据output怎么获取到输出线程的，还有上面很多地方没有说到的音频策略相关的，究竟，服务端如何根据客户端提供的 streamType 找到符合它的输出设备的？我相信你对这些都一无所知。
