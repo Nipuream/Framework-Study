@@ -1485,7 +1485,7 @@ AudioFlinger::ThreadBase::TrackBase::TrackBase(
 
 我相信只要看到Google工程师对这个类的注释，你也会恍然大悟吧。你是否还记得在AudioTrack最后调用createTrack()方法，生成了 IAudioTrack 对象，没错，TrackHandle 就是它服务端的代理对象，继承了BnAudioTrack，我相信这些方法都是对Track对象的控制和管理吧。下面我们来小结下AudioFlinger的初始化工作，如下图所示，首先最重要的是根据Client端传来的output找到了适合它自己的播放线程，然后这个线程调用createTrack_l()方法生成了Track对象，在这个对象构造方法，构建了STREAM模式下的共享内存，然后封装成TrackHandle对象返回给Client端的AudioTrack，而这个TrackHandle对象和Client端的IAudioTrack对象就是对这个Track对象和播放线程的控制和管理的作用。
 
-![audio_2](F:\project\github\Framework-Study\audio\audio_2.png)
+![audio_2](audio_2.png)
 
 
 
