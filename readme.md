@@ -8,3 +8,5 @@
 - application 是Android应用通过binder驱动和Native层进行通信的实例。
 - Shell脚本 是对bash脚本语法的简单记录和学习。
 - audio 是对Android系统音频模块的学习记录
+- yanghui11 是用c++实现的一些数据结构、算法、基于oop特性的设计模式。
+
