@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <binder/MemoryDealer.h>
 
 namespace android {
 	
@@ -52,11 +53,44 @@ namespace android {
 		}
 
 		close(this->fd);
-		this->fd = NULL;
+		this->fd = -1;
+		return 1;
 	}
 
+
 	
-	
+	 sp<IMemory> yanghuiService::getIMemory(){
+
+	    LOGI(">>> yanghuiService::getIMemory %p >>>> \n",(this->imem).get());
+		return this->imem;
+	}
+
+
+	yanghuiService::yanghuiService(){
+
+		LOGI("Enter yanghuiService ~");
+		sp<MemoryDealer> mMemoryDealer = new MemoryDealer(1024 * 100, "yanghui_Memory");
+		size_t size = sizeof(yanghui_track_cblk_t);
+		LOGI("yanghui_track_cblk_t size : %d ",size);
+		sp<IMemory> tmp = mMemoryDealer->allocate(size);
+
+        yanghui_track_cblk_t* mCblk = static_cast<yanghui_track_cblk_t>(tmp->pointer());
+		new (mCblk) yanghui_track_cblk_t();
+
+		this->serverProxy = new YhServerProxy();
+		
+		this->imem = tmp;
+	}
+
+	yanghuiService::~yanghuiService(){
+
+		if(this->imem != NULL){
+            //(this->imem)->getHeap()->dispose();
+			LOGI("destroy  yanghuiservice .");
+		}
+
+	}
+
 	status_t yanghuiService::onTransact(
                                 uint32_t code,
                                 const Parcel& data,
@@ -67,8 +101,4 @@ namespace android {
 		return BnyanghuiService::onTransact(code, data, reply, flags);
     }
 
-    
-
-	 
-	
 }

@@ -2,6 +2,7 @@
 #define _I_YANGHUI_SERVICE_H
 
 #include <binder/IInterface.h>
+#include <binder/IMemory.h>
 #include "Icallback.h"
 
 namespace android{
@@ -12,7 +13,9 @@ namespace android{
       virtual status_t openMemory(const char* fileName, status_t size) = 0;
       virtual int setcallback(const sp<Icallback>& callback) = 0;
 	  virtual status_t closeMemory() = 0;
+	  virtual sp<IMemory> getIMemory() = 0;
   };
+  
   class BnyanghuiService : public BnInterface<IyanghuiService>{
   public:
     virtual status_t    onTransact( uint32_t code,

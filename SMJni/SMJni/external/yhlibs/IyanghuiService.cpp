@@ -12,7 +12,8 @@ namespace android {
 	enum {
 		OPEN_MEMORY,
 		SET_CALLBACK,
-		CLOSE_MEMORY
+		CLOSE_MEMORY,
+		GET_IMEMORY
 	};
 	
 	
@@ -44,10 +45,19 @@ namespace android {
 
 			virtual status_t closeMemory() {
 
-			   LOGI(">>>> BnyanghuiService::closeMemory >>> \n");
+			   LOGI(">>>> BpyanghuiService::closeMemory >>> \n");
 			   Parcel data,reply;
 			   remote()->transact(CLOSE_MEMORY, data, &reply);
 			   return reply.readInt32();
+			}
+
+			
+			virtual sp<IMemory> getIMemory() {
+               LOGI(">>> BpyanghuiService::getIMemory >>> \n");
+			   Parcel data,reply;
+			   remote()->transact(GET_IMEMORY, data, &reply);
+			   sp<IMemory> iMem = interface_cast<IMemory>(reply.readStrongBinder());
+			   return iMem;
 			}
 	};
 
@@ -83,6 +93,13 @@ namespace android {
                  return NO_ERROR;
 			  }
 			  break;
+			  case GET_IMEMORY:{
+			  	  LOGI(">>> GET_IMEMROY >>>>> \n");
+              	  sp<IMemory> imem = getIMemory();
+				  reply->writeStrongBinder(imem->asBinder());
+				  return NO_ERROR;
+			  	}
+				break;
 			  default:{
 				  LOGI(">>>> BnyanghuiService::onTransact defalut... >>>");
 				  return BBinder::onTransact(code,data,reply,flags);

@@ -5,6 +5,7 @@
 #include "../include/IyanghuiService.h"
 #include "../include/Icallback.h"
 #include <binder/BinderService.h>
+#include "../include/yhshared.h"
 
 namespace android {
 	
@@ -18,6 +19,9 @@ namespace android {
        virtual status_t openMemory(const char* fileName, status_t size);
        virtual int setcallback(const sp<Icallback>& callback);
 	   virtual status_t closeMemory();
+	   yanghuiService();
+	   ~yanghuiService();
+	   virtual sp<IMemory> getIMemory();
 	   
        virtual     status_t    onTransact(
                                 uint32_t code,
@@ -29,6 +33,9 @@ namespace android {
 		   sp<Icallback> mcallback;
 		   int fd;
 		   void* addr;
+		   sp<IMemory> imem;
+		   sp<YhServerProxy> serverProxy;
+		   
 
 	};
 	

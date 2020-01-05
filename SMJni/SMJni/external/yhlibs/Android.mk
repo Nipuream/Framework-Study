@@ -8,13 +8,16 @@ LOCAL_C_INCLUDES:=\
   
 LOCAL_SRC_FILES:=\
   Icallback.cpp \
-  IyanghuiService.cpp 
+  IyanghuiService.cpp \
+  yhshared.cpp 
+  
   
 LOCAL_SHARED_LIBRARIES:=\
   libcutils \
   liblog \
   libutils \
-  libbinder
+  libbinder \
+  libnbaio
 
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
 LOCAL_PRELINK_MODULE := false
