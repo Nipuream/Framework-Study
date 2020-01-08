@@ -57,8 +57,6 @@ namespace android {
 		return 1;
 	}
 
-
-	
 	 sp<IMemory> yanghuiService::getIMemory(){
 
 	    LOGI(">>> yanghuiService::getIMemory %p >>>> \n",(this->imem).get());
@@ -69,22 +67,35 @@ namespace android {
 	yanghuiService::yanghuiService(){
 
 		LOGI("Enter yanghuiService ~");
-		sp<MemoryDealer> mMemoryDealer = new MemoryDealer(1024 * 100, "yanghui_Memory");
+
+        int len = sizeof(char);
+		LOGI("char size : %d", sizeof(char));
+		sp<MemoryDealer> mMemoryDealer = new MemoryDealer(len * 100, "yanghui_Memory");
 		size_t size = sizeof(yanghui_track_cblk_t);
+		size_t bufferSize = len * 50;
 		LOGI("yanghui_track_cblk_t size : %d ",size);
-		sp<IMemory> tmp = mMemoryDealer->allocate(size);
+		sp<IMemory> tmp = mMemoryDealer->allocate(size + bufferSize);
 
-        yanghui_track_cblk_t* mCblk = static_cast<yanghui_track_cblk_t>(tmp->pointer());
+        yanghui_track_cblk_t* mCblk = static_cast<yanghui_track_cblk_t*>(tmp->pointer());
 		new (mCblk) yanghui_track_cblk_t();
+		            
 
-		this->serverProxy = new YhServerProxy();
-		
+		void* mBuffer = (char*)mCblk + sizeof(yanghui_track_cblk_t);
+		LOGI("mCblk address : %p, mBuffer address : %p",mCblk,mBuffer);
+		memset(mBuffer,0,bufferSize);
+
+		this->serverProxy = new YhServerProxy(mCblk, mBuffer,50,len);
 		this->imem = tmp;
+
+		this->thread = new ResumeThread(this);
+		(this->thread)->run("resumeThread",PRIORITY_DEFAULT,0); //destroy ?
+		(this->thread)->incStrong(this);
 	}
 
 	yanghuiService::~yanghuiService(){
 
 		if(this->imem != NULL){
+			(this->thread)->decStrong(this);
             //(this->imem)->getHeap()->dispose();
 			LOGI("destroy  yanghuiservice .");
 		}

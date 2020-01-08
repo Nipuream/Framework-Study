@@ -46,7 +46,7 @@ struct Buffer {
 struct yanghui_track_cblk_t {
 
    yanghui_track_cblk_t();
-   ~yanghui_track_cblk_t();
+   ~yanghui_track_cblk_t(){};
 
    uint32_t mServer;
 

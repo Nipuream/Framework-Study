@@ -2,6 +2,19 @@
 
 using namespace android;
 
+
+yanghui_track_cblk_t::yanghui_track_cblk_t(){
+
+   LOGI("init yanghui_track_cblk_t.");
+   mServer = 0;
+   mFront = 0;
+   mRear = 0;
+   mUnderrunFrames = 0;
+   mMinimum = 0;
+  
+}
+
+
 YhProxy::YhProxy(yanghui_track_cblk_t* cblk, void* buffers, size_t frameCount, size_t frameSize)
         : mCblk(cblk),mBuffers(buffers),mFrameCount(frameCount),mFrameSize(frameSize),mFrameCountP2(roundup(frameCount))
 {
@@ -26,12 +39,14 @@ size_t YhClientProxy::obtainBuffer(Buffer* buffer){
       int32_t rear = cblk->mRear;
 
       ssize_t filled = rear - front;
+	  LOGI("front : %d, rear : %d, filled : %d", front, rear, filled);
       if(!(0 <= filled && (size_t)filled <= mFrameCount)){
           status = RESULT_FAILED; //not init.
           goto end;
       }
 
       size_t avail = mFrameCount - filled;
+	  LOGI("avail : %d", avail);
       if(avail > 0){
    
           size_t part1;
@@ -111,6 +126,7 @@ void YhClientProxy::releaseBuffer(Buffer* buffer){
 
    int32_t rear = cblk->mRear;
    android_atomic_release_store(stepCount + rear, &cblk->mRear);
+   LOGI("cblk mRear : %d", cblk->mRear);
 }
 
 
