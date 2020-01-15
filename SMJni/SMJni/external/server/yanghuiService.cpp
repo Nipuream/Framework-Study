@@ -88,7 +88,7 @@ namespace android {
 		this->imem = tmp;
 
 		this->thread = new ResumeThread(this);
-		(this->thread)->run("resumeThread",PRIORITY_DEFAULT,0); //destroy ?
+		(this->thread)->run("resumeThread",PRIORITY_DEFAULT,0);
 		(this->thread)->incStrong(this);
 	}
 

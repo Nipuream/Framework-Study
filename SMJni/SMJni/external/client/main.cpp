@@ -11,8 +11,6 @@ using namespace android;
 
 sp<YhClientProxy> proxy;
 
-int index = 0;
-
 void test(){
    LOGI("provider pointer.");
 }
@@ -31,10 +29,17 @@ void productData(sp<YhClientProxy>& proxy){
 			memset(buffer.mRaw, 0, size);
 		
 			char* helloStr = "hello yanghui11";
-			memcpy(buffer.mRaw, helloStr, sizeof(char) * strlen(helloStr));
+			size_t strSize = sizeof(char) * strlen(helloStr);
+
+            for(int i = 0;i< (size/strSize);i++){
+				memcpy(buffer.mRaw + i * strSize, helloStr, strSize);
+			}
+
+			if(size % strSize != 0){
+                memcpy(buffer.mRaw + (size/strSize)*strSize, helloStr,size%strSize);
+			}
 			
 			proxy->releaseBuffer(&buffer);
-			index ++;
 		}
 
 		sleep(30);
@@ -74,16 +79,13 @@ int main(int argc, char** argv){
 
 		yanghui_track_cblk_t* mCblk = static_cast<yanghui_track_cblk_t *>(iMem->pointer());
 
-		
 		if(mCblk != NULL){
 
           new(mCblk) yanghui_track_cblk_t();
-
 		  void* mBuffer = (char*)mCblk + sizeof(yanghui_track_cblk_t);
 		  proxy = new YhClientProxy(mCblk, mBuffer, 50, len);
 
           productData(proxy);
-
 		}
 		
 

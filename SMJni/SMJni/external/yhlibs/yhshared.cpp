@@ -18,6 +18,7 @@ yanghui_track_cblk_t::yanghui_track_cblk_t(){
 YhProxy::YhProxy(yanghui_track_cblk_t* cblk, void* buffers, size_t frameCount, size_t frameSize)
         : mCblk(cblk),mBuffers(buffers),mFrameCount(frameCount),mFrameSize(frameSize),mFrameCountP2(roundup(frameCount))
 {
+   LOGI("frameCount : %d, mFrameCountP2 : %d", mFrameCount, mFrameCountP2);
 }
 
 size_t YhClientProxy::obtainBuffer(Buffer* buffer){
